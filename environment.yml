@@ -1,14 +1,13 @@
 name: student_project
 
+channels:
+    - defaults
+    - conda-forge
+    - r
+
 dependencies:
-- numpy
-- pandas
-- jupyterlab
-- matplotlib
-- seaborn
-- scipy
-- statsmodels
-- pip
-- pip:
+    - ipykernel   = 5.1.4
+    - jupyterlab  = 2.1.2
+    - python      = 3.8.2
 
-
+    - r-base      = 4.0.0
