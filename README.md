@@ -3,9 +3,7 @@
 In this repository you can find the code with which I try to replicate the
 results obtained by:
 
-[Allcott, H., Braghieri, L., Eichmeyer, S., & Gentzkow, M. (2020). The welfare
-effects of social media. *American Economic Review, 110(3)*, 629-76.]
-(https://www.aeaweb.org/articles?id=10.1257/aer.20190658)
+[Allcott, H., Braghieri, L., Eichmeyer, S., & Gentzkow, M. (2020). The welfare effects of social media. *American Economic Review, 110(3)*, 629-76.](https://www.aeaweb.org/articles?id=10.1257/aer.20190658)
 
 <a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/blob/master/replication_notebook.ipynb"
    target="_parent">
