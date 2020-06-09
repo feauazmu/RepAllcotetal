@@ -1,2 +1,2 @@
 #!/bin/sh
-Rscript ./r_packages.R
+Rscript ./utils/r_packages.R
