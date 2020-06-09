@@ -1,7 +1,6 @@
 ## R package installation and configuration
 
-install.packages(c("stringi",
-                   "dplyr",
+install.packages(c("dplyr",
                    "haven",
                    "ggplot2",
                    "gt",
