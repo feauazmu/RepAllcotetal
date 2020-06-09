@@ -10,4 +10,8 @@ dependencies:
     - python      = 3.8.2
 
     - r-base      = 4.0.0
-    - r-stringi   = 1.4.6
+    - r-gt        = 0.2.1
+    - r-haven     = 2.3.1
+    - r-irdisplay = 0.7
+    - r-irkernel  = 1.1
+    - r-tidyverse = 1.3.0
