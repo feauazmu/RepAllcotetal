@@ -1,9 +1,5 @@
 ## R package installation and configuration
 
-install.packages("stringi",
-                 configure.args=c("--disable-cxx11"),
-                 repos = "https://cloud.r-project.org/")
-
 install.packages(c("stringi",
                    "dplyr",
                    "haven",
