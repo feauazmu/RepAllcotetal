@@ -1,5 +1,6 @@
 library(dplyr, warn.conflicts = FALSE)
 library(gt)
+library(tibble)
 library(tidyr)
 
 # Sample demographics.  Table 2
@@ -88,4 +89,157 @@ genTableTwo <- function(data) {
         as_raw_html(inline_css = TRUE)
     
     table
+}
+
+## Table 3 - Survey Response and Treatment Compliance Rates
+genTableThree <- function(panel, configFile) {
+    
+    startExperiment <- as.Date(configFile$metadata$dates$start_experiment, 
+                               format = "mdy(%m, %d, %Y)")
+    
+    df <- panel %>%
+        filter(sample_main == 1) %>%
+        mutate(midline_day = difftime(enddate_midline, startExperiment, 
+                                      units = "days"), 
+               comp_endline = structure(1 - no_endline, 
+                                        label = "Completed endline survey"),
+               comp_postendline = structure(1 - no_postendline, 
+                                            label = "Completed post-endline survey"))
+    
+    ### Generating extra variables:
+    answer_sms <- numeric(length = nrow(df))
+    days_deact <- numeric(length = nrow(df))
+    num_days_checked <- numeric(length = nrow(df))
+    
+    for(row in 1:nrow(df)) {
+        for (x in 7:44) {
+            if(x %in% 7:42){
+                if(
+                    !is.na(df[row, paste("happy_sms", x, sep = "")]) | 
+                    !is.na(df[row, paste("lonely_sms", x, sep = "")]) |
+                    !is.na(df[row, paste("mood_sms", x, sep = "")]) 
+                    ){
+                    answer_sms[row] <- answer_sms[row] + 1
+                }
+            }
+            if(x %in% 12:44){
+                if(
+                    !is.na(df[row, paste("numchecks_day", x, sep="")]) &
+                    df[row, paste("numchecks_day", x, sep="")] > 0 &
+                    df[row, "midline_day"] + 1 < x &
+                    df[row, "endline_day"] < x &
+                    !is.na(df[row, paste("D_day", x, sep="")])
+                    
+                ) {
+                    days_deact[row] <- days_deact[row] + 
+                        df[[row, paste("D_day", x, sep="")]][1]
+                    num_days_checked[row] <- num_days_checked[row] + 1
+                }
+            }
+        }
+    }
+    
+    num_days_checked <- replace(num_days_checked, num_days_checked == 0, NA)
+    ## Generate the table with the new variables
+    
+    table <- df %>%
+        select(T, comp_endline, comp_postendline) %>%
+        add_column(answer_sms, .before = "comp_postendline") %>%
+        mutate(answer_sms = structure(answer_sms/36, 
+                                      label = "Share of text messages completed"),
+               share_deact = structure(days_deact/num_days_checked, 
+                                       label = "Share days deactivated")
+               ) 
+    
+    ## Filling the p values from the t-tests
+    pValues <- rep(NA, 4)
+    for (col in 2:ncol(table)) {
+        pValues[col - 1] <- t.test(table[table$T == 0, col], 
+                                   table[table$T == 1, col])$p.value
+    }
+    pValues <- c(pValues[1], NA, pValues[2], NA, pValues[3], NA, pValues[4],
+                 rep(NA, 2))
+    
+    tableThree <- table %>% 
+        group_by(T) %>%
+        mutate(n = n()) %>%
+        summarise_all(.funs = list(
+            mean = ~mean(x = ., na.rm = TRUE),
+            sd = ~sd(x = ., na.rm = TRUE)
+        )) %>%
+        select(comp_endline_mean,
+               comp_endline_sd,
+               answer_sms_mean,
+               answer_sms_sd,
+               comp_postendline_mean,
+               comp_postendline_sd,
+               share_deact_mean,
+               share_deact_sd,
+               n_mean) %>%
+        arrange(c(2,1)) %>%
+        rbind(pValues) %>%
+        rename(n = n_mean) %>%
+        mutate(rowname = c("treatment", "control", "pvalue")) %>%
+        pivot_longer(-rowname, "Variable", "value") %>%
+        pivot_wider(Variable, rowname) %>%
+        mutate(Variable = c(
+            "Completed endline survey",
+            NA,
+            "Share of text messages completed",
+            NA,
+            "Completed post-endline survey", 
+            NA,
+            "Share days deactivated",
+            NA,
+            "Observations"
+        )) %>%
+        gt() %>%
+        fmt_number(
+            columns = vars(treatment, control),
+            decimals = 2,
+            drop_trailing_zeros = TRUE,
+            sep_mark = ","
+        ) %>%
+        fmt_number(
+            columns = vars(treatment, control),
+            rows = c(2, 4, 6, 8),
+            decimals = 2,
+            drop_trailing_zeros = FALSE,
+            pattern = "({x})",
+            sep_mark = ","
+        ) %>%
+        fmt_number(
+            columns = vars(pvalue),
+            decimals = 2,
+            drop_trailing_zeros = FALSE,
+            sep_mark = ","
+        ) %>%
+        fmt_missing(
+            columns = everything(),
+            missing_text = "") %>%
+        cols_align(
+            align = "center",
+            columns = vars(treatment, control, pvalue)
+        ) %>%
+        cols_label(
+            treatment = html("<center>Treatment <br> mean/SD <br> (1)</center>"),
+            control = html("<center>Control <br> mean/SD <br> (1)</center>"),
+            pvalue = html("<center><br><i>t</i>-test <i>p</i>-value<br> (3)</center>")
+        ) %>%
+        tab_header("Table 3—Survey Response and Treatment Compliance Rates") %>%
+        tab_source_note(
+            source_note = html("<center><i>Notes</i>: Columns 1 and 2 present 
+            survey response and treatment compliance rates for the Treatment 
+            and Control groups in the impact evaluation sample: participants who 
+            were willing to accept less than $102 to deactivate Facebook for the 
+            four weeks after midline and were offered <i>p</i> = $102 or 
+            <i>p</i> = $0 to do so. Column 3 presents <i>p</i>-values of tests 
+            of differences in response rates between the two groups.</center>")
+        ) %>%
+        tab_options(
+            table.width = pct(75)
+        ) %>%
+        as_raw_html(inline_css = TRUE)
+    
+    tableThree
 }
