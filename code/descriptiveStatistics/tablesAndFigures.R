@@ -1,5 +1,6 @@
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
+suppressMessages(library(cowplot, warn.conflicts = FALSE))
 library(gt)
 library(tibble)
 library(tidyr)
@@ -439,4 +440,51 @@ genFigSeven <- function(panel) {
       title = "Figure 7. Probability of Being Deactivated"
     ) +
     theme(legend.title = element_blank(), legend.position = "bottom")
+  
+  p
+}
+
+## Figure 8. Key Opinions about Facebook in Treatment and Control
+genFigEight <- function(panel) {
+  
+  df <- panel %>%
+    filter(sample_main == 1) %>%
+    mutate(T = as.factor(recode(T, `1` = "Treatment", `0` = "Control")))
+  
+  ## Generate the plots
+  plot_fb_deact_bad <- ggplot(df, aes(fb_deact_good, y = ..density..)) + 
+    geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) + 
+    geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) + 
+    labs(
+      x = "Deactivation bad",
+      y = "Density"
+    ) + 
+    scale_fill_manual("", values = c(
+      "Control" = "gray61",
+      "Treatment" = NA
+    )) + 
+    scale_color_manual("", values = c(
+      "Treatment" = "firebrick4",
+      "Control" = "white"
+    )) +
+    theme(legend.title = element_blank(), legend.position = "bottom")
+  
+  plot_fb_habit <- ggplot(df, aes(fb_habit, y = ..density..)) + 
+    geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) + 
+    geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) + 
+    labs(
+      x = "People would miss Facebook",
+      y = "Density"
+    ) + 
+    scale_fill_manual("", values = c(
+      "Control" = "gray61",
+      "Treatment" = NA
+    )) + 
+    scale_color_manual("", values = c(
+      "Treatment" = "firebrick4",
+      "Control" = "white"
+    )) + 
+    theme(legend.title = element_blank(), legend.position = "bottom")
+  
+  p <- plot_grid(plot_fb_habit, plot_fb_deact_bad)
 }
