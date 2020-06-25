@@ -347,3 +347,96 @@ genFigFour <- function(panel) {
   
   p
 }
+
+## Figure 7.
+genFigSeven <- function(panel) {
+  ### Set variables for calculationg moving averages (to smooth things out)
+  rep_three <- rep(1 / 3, 3)
+  rep_five <- rep(1 / 5, 5)
+
+  df <- panel %>%
+    filter(sample_main == 1) %>%
+    select(
+      starts_with("D_day"), starts_with("numchecks_day"),
+      id, T, v
+    ) %>%
+    gather(day, vars, starts_with(c("D_day", "numchecks_day"))) %>%
+    extract(day, c("var", "day_numeric"), "([a-zA-Z_]+)([0-9]+)",
+      remove = TRUE, convert = TRUE
+    ) %>%
+    pivot_wider(names_from = var, values_from = vars) %>%
+    complete(
+      day_numeric = seq(min(day_numeric), max(day_numeric)),
+      nesting(id)
+    ) %>%
+    arrange(id, day_numeric) %>%
+    mutate(T = as.factor(recode(T, `1` = "Treatment", `0` = "Control"))) %>%
+    group_by(day_numeric, T) %>%
+    summarise_all(mean, na.rm = TRUE) %>%
+    mutate(
+      day_adjusted = day_numeric - 14,
+      allmissing = if_else(is.na(D_day), 1, 0),
+      checked_day = if_else(numchecks_day > 0 & !is.na(numchecks_day),
+        1, numchecks_day
+      ),
+      D_day = replace_na(D_day, 0)
+    )
+
+  ### Generate moving avarages
+  for (i in c("Treatment", "Control")) {
+    nam_ma <- paste("ma_D_day_", i, sep = "")
+    ma1_D_day <- as.numeric(stats::filter(df[df$T == i, "D_day"],
+      rep_three,
+      sides = 2
+    ))
+    ma2_D_day <- as.numeric(stats::filter(df[df$T == i, "D_day"],
+      rep_five,
+      sides = 2
+    ))
+    assign(nam_ma, cbind(df[df$T == i, c("day_numeric", "T")],
+      "ma1_D_day" = ma1_D_day, "ma2_D_day" = ma2_D_day
+    ))
+  }
+  ma_D_day <- rbind(ma_D_day_Control, ma_D_day_Treatment)
+  suppressMessages(df <- left_join(df, ma_D_day))
+
+  df <- df %>% mutate(
+    D_day_ma = case_when(
+      day_adjusted >= 35 | (day_adjusted >= 4 &
+        day_adjusted <= 7 & T == "Control") ~ ma1_D_day,
+      day_adjusted >= 80 ~ ma2_D_day,
+      (day_adjusted == 12 | day_adjusted == 17 |
+        day_adjusted == 21 | day_adjusted == 25) & T == "Control" ~ ma1_D_day,
+      (day_adjusted == 13 | day_adjusted == 18 | day_adjusted == 22
+      | day_adjusted == 26) & T == "Control" ~ NA_real_,
+      allmissing == 1 ~ NA_real_,
+      TRUE ~ D_day
+    )
+  )
+
+  ## Construct the plot
+  p <- ggplot(df) +
+    geom_line(aes(x = day_adjusted, y = D_day_ma, color = T), na.rm = TRUE) +
+    geom_point(aes(
+      x = day_adjusted, y = D_day_ma, color = T,
+      shape = T
+    ), na.rm = TRUE) +
+    geom_rect(aes(
+      xmin = 0, xmax = 2, ymin = 0, ymax = Inf,
+      fill = "Midline/endline 24hr periods"
+    ), alpha = 0.01) +
+    geom_rect(aes(
+      xmin = 27, xmax = 29, ymin = 0, ymax = Inf,
+      fill = "Midline/endline 24hr periods"
+    ), alpha = 0.01) +
+    scale_fill_manual(
+      values = "grey",
+      labels = c("Midline/endline 24hr periods")
+    ) +
+    labs(
+      x = "Days after beginning of deactivation period",
+      y = "Share Deactivated",
+      title = "Figure 7. Probability of Being Deactivated"
+    ) +
+    theme(legend.title = element_blank(), legend.position = "bottom")
+}
