@@ -10,6 +10,7 @@ dependencies:
     - python      = 3.8.2
 
     - r-base      = 4.0.0
+    - r-cowplot   = 1.0.0
     - r-gt        = 0.2.1
     - r-haven     = 2.3.1
     - r-irdisplay = 0.7
