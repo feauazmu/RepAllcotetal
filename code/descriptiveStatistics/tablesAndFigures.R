@@ -487,4 +487,6 @@ genFigEight <- function(panel) {
     theme(legend.title = element_blank(), legend.position = "bottom")
   
   p <- plot_grid(plot_fb_habit, plot_fb_deact_bad)
+  
+  p
 }
