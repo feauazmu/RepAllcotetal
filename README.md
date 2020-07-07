@@ -23,4 +23,4 @@ results obtained by:
 [![Build Status](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu.svg?branch=master)](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/blob/master/LICENSE)
-[![Continuous Integration](https://github.com/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/workflows/Continuous%20Integration/badge.svg)](https://github.com/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu)
+[![Continuous Integration](https://github.com/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/workflows/Continuous%20Integration/badge.svg)](https://github.com/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/actions)
