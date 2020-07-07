@@ -9,6 +9,7 @@ dependencies:
     - jupyterlab  = 2.1.2
     - python      = 3.8.2
 
+    - r-aer       = 1.2_9
     - r-base      = 4.0.0
     - r-cowplot   = 1.0.0
     - r-gt        = 0.2.1
