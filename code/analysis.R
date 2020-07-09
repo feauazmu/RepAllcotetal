@@ -1,5 +1,6 @@
 suppressMessages(library(AER))
 library(dplyr, warn.conflicts = FALSE)
+library(ggplot2)
 library(haven)
 
 ## Set options
@@ -114,11 +115,86 @@ for(vset in vset_list) {
 }
 
 ## Run regressions.
-for(vset in vset_list){
-    for (yvar in eval(parse(text = paste("vs_", vset, sep = "")))){
+for(vset in vset_list) {
+    for (yvar in eval(parse(text = paste("vs_", vset, sep = "")))) {
         eq <- setEquation(vset, yvar)
-        assign(paste(yvar, "_IV", sep=""),
-               ivreg(eq, data=df, weights=weight_main, method="robust"))
+        nam <- paste(yvar, "_IV", sep = "")
+        assign(nam, ivreg(eq, data = df, weights = weight_main))
+        assign(paste(nam, "_coeftest", sep = ""),
+               coeftest(eval(parse(text = nam)), vcov = vcovHC(eval(
+                   parse(text = nam)
+               ), "HC3")))
+        assign(paste(nam, "_coefci", sep = ""),
+               coefci(eval(parse(text = nam)), vcov = vcovHC(eval(
+                   parse(text = nam)
+               ), "HC3")))
     }
 }
 
+## Generate the main figures of the paper
+genFigDF <- function(vset_list) {
+    figDF <- data.frame()
+    for (vset in vset_list) {
+        for (yvar in eval(parse(text = paste("vs_", vset, sep = "")))) {
+            figDF <-
+                rbind(data.frame(
+                        variableLabel = eval(parse(text = paste(
+                            "name_", yvar,
+                            sep = ""
+                        ))),
+                        treatmentEffect = eval(parse(
+                            text = paste(yvar, "_IV_coeftest",
+                                         sep = "")
+                        ))["D", "Estimate"],
+                        confIntLow = eval(parse(
+                            text = paste(yvar, "_IV_coefci",
+                                         sep = "")
+                        ))["D", "2.5 %"],
+                        confIntHigh = eval(parse(
+                            text = paste(yvar, "_IV_coefci",
+                                         sep = "")
+                        ))["D", "97.5 %"],
+                        index = eval(parse(
+                            text = paste("indexname_", vset,
+                                         sep = "")
+                        )),
+                        stringsAsFactors = TRUE
+                    ), figDF
+                )
+        }
+    }
+    
+    figDF
+}
+
+figTwoDF <- genFigDF(c("sub_news", "social", "sub_time"))
+figThreeDF <- genFigDF(c("voting", "polarize", "news"))
+figFiveDF <- genFigDF(c("swb"))
+figSixDF <- genFigDF(c("fbopinions" ,"postexp"))
+
+## Plot main figures.
+genMainFigure <- function(figDF) {
+    mainFigure <- ggplot(figDF) +
+        geom_errorbarh(aes(y = variableLabel, xmin = confIntLow,
+                           xmax = confIntHigh),
+                       color = "dodgerblue3") +
+        geom_point(aes(x = treatmentEffect, y = variableLabel),
+                   color = "dodgerblue3") +
+        facet_wrap(
+            . ~ index,
+            strip.position = "left",
+            scales = "free_y",
+            ncol = 1
+        ) +
+        geom_vline(xintercept = 0, color = "firebrick3") + 
+        labs(
+            x = "Treatment effect (standard deviations)",
+            y = ""
+        )
+    mainFigure
+}
+
+figureTwo <- genMainFigure(figTwoDF) + labs(title = "Figure 2. Substitutes for Facebook")
+figureThree <- genMainFigure(figThreeDF) + labs(title = "Figure 3. Effects on News and Political Outcomes")
+figureFive <- genMainFigure(figFiveDF) + labs(title = "Figure 5. Effects on Subjective Well-Being")
+figureSix <- genMainFigure(figSixDF) + labs(title = "Figure 6. Effects on Post-Experiment Facebook Use and Opinions")
