@@ -449,7 +449,7 @@ genFigEight <- function(panel) {
 
   df <- panel %>%
     filter(sample_main == 1) %>%
-    mutate(T = as.factor(recode(T, `1` = "Treatment", `0` = "Control")))
+    mutate(T = as.factor(recode(T, "1 = 'Treatment'; 0 = 'Control'")))
 
   ## Generate the plots
   plot_fb_deact_bad <- ggplot(df, aes(fb_deact_good, y = ..density..)) +
