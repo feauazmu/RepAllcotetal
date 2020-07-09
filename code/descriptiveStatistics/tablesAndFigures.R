@@ -81,20 +81,20 @@ genTableTwo <- function(data) {
     ) %>%
     tab_header("Table 2—Sample Demographics") %>%
     tab_source_note(
-      source_note = html("<center><i>Notes</i>: Column 1 presents average 
-            demographics for the impact evaluation sample: participants who were 
-            willing to accept less than $102 to deactivate Facebook for the four 
-            weeks after midline and were offered <i>p</i> = $102 or <i>p</i> = 
-            $0 to do so. Column 2 presents our estimate of average demographics 
-            of American adults with a Facebook account. The top five numbers in 
-            column 2 are inferred from a Pew Research Center (2018f) survey of 
-            social media use by demographic group. The bottom number in column 2 
-            (the average of 45 minutes of Facebook use per day) is approximated 
-            on those basis of sources such as Facebook (2016) and Molla and 
-            Wagner (2018). Column 3 presents average demographics of American 
-            adults. The top five numbers are from the 2017 American Community 
-            Survey (US Census Bureau 2017), and the Republican and Democrat 
-            shares are from the 2016 American National Election Study (American 
+      source_note = html("<center><i>Notes</i>: Column 1 presents average
+            demographics for the impact evaluation sample: participants who were
+            willing to accept less than $102 to deactivate Facebook for the four
+            weeks after midline and were offered <i>p</i> = $102 or <i>p</i> =
+            $0 to do so. Column 2 presents our estimate of average demographics
+            of American adults with a Facebook account. The top five numbers in
+            column 2 are inferred from a Pew Research Center (2018f) survey of
+            social media use by demographic group. The bottom number in column 2
+            (the average of 45 minutes of Facebook use per day) is approximated
+            on those basis of sources such as Facebook (2016) and Molla and
+            Wagner (2018). Column 3 presents average demographics of American
+            adults. The top five numbers are from the 2017 American Community
+            Survey (US Census Bureau 2017), and the Republican and Democrat
+            shares are from the 2016 American National Election Study (American
             National Election Studies 2016)</center>")
     ) %>%
     tab_options(
@@ -257,12 +257,12 @@ genTableThree <- function(panel, configFile) {
     ) %>%
     tab_header("Table 3—Survey Response and Treatment Compliance Rates") %>%
     tab_source_note(
-      source_note = html("<center><i>Notes</i>: Columns 1 and 2 present 
-            survey response and treatment compliance rates for the Treatment 
-            and Control groups in the impact evaluation sample: participants who 
-            were willing to accept less than $102 to deactivate Facebook for the 
-            four weeks after midline and were offered <i>p</i> = $102 or 
-            <i>p</i> = $0 to do so. Column 3 presents <i>p</i>-values of tests 
+      source_note = html("<center><i>Notes</i>: Columns 1 and 2 present
+            survey response and treatment compliance rates for the Treatment
+            and Control groups in the impact evaluation sample: participants who
+            were willing to accept less than $102 to deactivate Facebook for the
+            four weeks after midline and were offered <i>p</i> = $102 or
+            <i>p</i> = $0 to do so. Column 3 presents <i>p</i>-values of tests
             of differences in response rates between the two groups.</center>")
     ) %>%
     tab_options(
@@ -297,7 +297,7 @@ genFigFour <- function(panel) {
         x = issue_opinion,
         color = "Control Republican",
         lty = "Control Republican"
-      ), 
+      ),
       na.rm=TRUE
     ) +
     geom_density(
@@ -306,7 +306,7 @@ genFigFour <- function(panel) {
         x = issue_opinion,
         color = "Treatment Republican",
         lty = "Treatment Republican"
-      ), 
+      ),
       na.rm=TRUE
     ) +
     geom_density(
@@ -315,7 +315,7 @@ genFigFour <- function(panel) {
         x = issue_opinion,
         color = "Control Democrat",
         lty = "Control Democrat"
-      ), 
+      ),
       na.rm=TRUE
     ) +
     geom_density(
@@ -324,7 +324,7 @@ genFigFour <- function(panel) {
         x = issue_opinion,
         color = "Treatment Democrat",
         lty = "Treatment Democrat"
-      ), 
+      ),
       na.rm=TRUE
     ) +
     labs(
@@ -345,7 +345,7 @@ genFigFour <- function(panel) {
     )) +
     theme(legend.position = "bottom") +
     labs(title = "Figure 4. Issue Opinions by Party at Endline")
-  
+
   p
 }
 
@@ -371,7 +371,7 @@ genFigSeven <- function(panel) {
       nesting(id)
     ) %>%
     arrange(id, day_numeric) %>%
-    mutate(T = as.factor(recode(T, `1` = "Treatment", `0` = "Control"))) %>%
+    mutate(T = as.factor(recode(T, "1 = 'Treatment'; 0 = 'Control'"))) %>%
     group_by(day_numeric, T) %>%
     summarise_all(mean, na.rm = TRUE) %>%
     mutate(
@@ -440,53 +440,53 @@ genFigSeven <- function(panel) {
       title = "Figure 7. Probability of Being Deactivated"
     ) +
     theme(legend.title = element_blank(), legend.position = "bottom")
-  
+
   p
 }
 
 ## Figure 8. Key Opinions about Facebook in Treatment and Control
 genFigEight <- function(panel) {
-  
+
   df <- panel %>%
     filter(sample_main == 1) %>%
     mutate(T = as.factor(recode(T, `1` = "Treatment", `0` = "Control")))
-  
+
   ## Generate the plots
-  plot_fb_deact_bad <- ggplot(df, aes(fb_deact_good, y = ..density..)) + 
-    geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) + 
-    geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) + 
+  plot_fb_deact_bad <- ggplot(df, aes(fb_deact_good, y = ..density..)) +
+    geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) +
+    geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) +
     labs(
       x = "Deactivation bad",
       y = "Density"
-    ) + 
+    ) +
     scale_fill_manual("", values = c(
       "Control" = "gray61",
       "Treatment" = NA
-    )) + 
+    )) +
     scale_color_manual("", values = c(
       "Treatment" = "firebrick4",
       "Control" = "white"
     )) +
     theme(legend.title = element_blank(), legend.position = "bottom")
-  
-  plot_fb_habit <- ggplot(df, aes(fb_habit, y = ..density..)) + 
-    geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) + 
-    geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) + 
+
+  plot_fb_habit <- ggplot(df, aes(fb_habit, y = ..density..)) +
+    geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) +
+    geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) +
     labs(
       x = "People would miss Facebook",
       y = "Density"
-    ) + 
+    ) +
     scale_fill_manual("", values = c(
       "Control" = "gray61",
       "Treatment" = NA
-    )) + 
+    )) +
     scale_color_manual("", values = c(
       "Treatment" = "firebrick4",
       "Control" = "white"
-    )) + 
+    )) +
     theme(legend.title = element_blank(), legend.position = "bottom")
-  
+
   p <- plot_grid(plot_fb_habit, plot_fb_deact_bad)
-  
+
   p
 }
