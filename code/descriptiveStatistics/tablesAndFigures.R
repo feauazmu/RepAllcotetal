@@ -485,8 +485,25 @@ genFigEight <- function(panel) {
       "Control" = "white"
     )) +
     theme(legend.title = element_blank(), legend.position = "bottom")
+  
+  ## Generate the title.
+  title <- ggdraw() + 
+    draw_label(
+      "Figure 8. Key Opinions about Facebook in Treatment and Control",
+      fontface = "bold",
+      x = 0,
+      hjust = 0,
+    ) + 
+    theme(
+      plot.margin = margin(0, 0, 0, 7)
+    )
 
-  p <- plot_grid(plot_fb_habit, plot_fb_deact_bad)
+  figures <- plot_grid(plot_fb_habit, plot_fb_deact_bad)
+  p <- plot_grid(
+    title, figures,
+    ncol  = 1,
+    rel_heights = c(0.1, 1)
+  )
 
   p
 }
