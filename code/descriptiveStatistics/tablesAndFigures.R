@@ -27,11 +27,11 @@ genTableTwo <- function(data) {
   ## The sources for the following values can be found in the footnote for
   ## Table 2
 
-  fbCol <- setNames(c(0.4067, 0.3312, 0.7272, 0.4431, 0.2552, NA, NA, 45),
+  fbCol <- setNames(c(0.4067, 0.3312, 0.4431, 0.7272, 0.2552, NA, NA, 45),
     nm = varb
   )
   usCol <- setNames(c(
-    0.4209, 0.2941, 0.7397, 0.4871, 0.2142, 0.2612, 0.1952,
+    0.4209, 0.2941, 0.4871, 0.7397, 0.2142, 0.2612, 0.1952,
     NA
   ),
   nm = varb
