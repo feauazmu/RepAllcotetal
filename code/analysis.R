@@ -255,7 +255,8 @@ genExtraTable <- function(figDf, title) {
         tab_source_note(
             source_note = html("<center><i>Notes</i>: The order in which the 
                                variables appear in the table may be different 
-                               from the figure.</center>")
+                               from the order in which they appear in the
+                               figure</center>")
         ) %>%
         tab_header(title) %>%
         tab_options(
