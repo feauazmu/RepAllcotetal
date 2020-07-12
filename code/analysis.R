@@ -1,7 +1,9 @@
 suppressMessages(library(AER))
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
+library(gt)
 library(haven)
+library(purrr, warn.conflicts = FALSE)
 
 ## Set options
 
@@ -146,6 +148,14 @@ genFigDF <- function(vset_list) {
                             text = paste(yvar, "_IV_coeftest",
                                          sep = "")
                         ))["D", "Estimate"],
+                        stdError = eval(parse(
+                            text = paste(yvar, "_IV_coeftest",
+                                         sep = "")
+                        ))["D", "Std. Error"],
+                        pValue = eval(parse(
+                            text = paste(yvar, "_IV_coeftest",
+                                         sep = "")
+                        ))["D", "Pr(>|t|)"],
                         confIntLow = eval(parse(
                             text = paste(yvar, "_IV_coefci",
                                          sep = "")
@@ -198,3 +208,64 @@ figureTwo <- genMainFigure(figTwoDF) + labs(title = "Figure 2. Substitutes for F
 figureThree <- genMainFigure(figThreeDF) + labs(title = "Figure 3. Effects on News and Political Outcomes")
 figureFive <- genMainFigure(figFiveDF) + labs(title = "Figure 5. Effects on Subjective Well-Being")
 figureSix <- genMainFigure(figSixDF) + labs(title = "Figure 6. Effects on Post-Experiment Facebook Use and Opinions")
+
+# Generate extra tables.
+genExtraTable <- function(figDf, title) {
+    table <- figDf %>%
+        select(
+            variableLabel,
+            treatmentEffect,
+            stdError,
+            pValue
+               ) %>%
+        map_df(rev) %>%
+        gt() %>%
+        fmt_number(
+            columns = vars(treatmentEffect, stdError, pValue),
+            decimals = 2,
+            drop_trailing_zeros = FALSE,
+            sep_mark = ","
+        ) %>%
+        cols_align(
+            align = "center",
+            columns = vars(treatmentEffect, stdError, pValue)
+        ) %>%
+        cols_align(
+            align = "left",
+            columns = vars(variableLabel)
+        ) %>%
+        cols_label(
+            variableLabel = html(""),
+            treatmentEffect = html("<center>Treatment Effect</center>"),
+            stdError = html("<center>Standard Error</center>"),
+            pValue = html("<center><i>p</i>-value</center>")
+        )%>%
+        tab_style(
+            style = cell_text(color = "red"),
+            locations = cells_body(
+                columns = vars(pValue),
+                rows = pValue < 0.05)
+        ) %>%
+        tab_style(
+            style = cell_text(weight = "bold"),
+            locations = cells_body(
+                columns = vars(variableLabel),
+                rows = grepl("index", variableLabel))
+        ) %>%
+        tab_source_note(
+            source_note = html("<center><i>Notes</i>: The order in which the 
+                               variables appear in the table may be different 
+                               from the figure.</center>")
+        ) %>%
+        tab_header(title) %>%
+        tab_options(
+            table.width = pct(75)
+        )  %>%
+         as_raw_html(inline_css = TRUE)
+    table
+}
+
+extraTableTwo <- genExtraTable(figTwoDF, "Substitutes for Facebook")
+extraTableThree <- genExtraTable(figThreeDF, "Effects on News and Political Outcomes")
+extraTableFive <- genExtraTable(figFiveDF, "Effects on Subjective Well-Being")
+extraTableSix <- genExtraTable(figSixDF, "Effects on Post-Experiment Facebook Use and Opinions")
