@@ -221,6 +221,10 @@ name_time_to_reactivation <- "Speed of reactivation"
 name_mobile_minutes_wins <- "Facebook mobile app use"
 name_index_postexp <- "Post-experiment use index"
 
+name_happy_sms<- "SMS happiness"
+name_pos_emotion_sms<- "SMS positive emotion"
+name_lonely_sms<- "SMS not lonely"
+
 ## List of Heterogeneous Treatment Effect (HTE) outcome vars
 for (mod in c(
   "W0",

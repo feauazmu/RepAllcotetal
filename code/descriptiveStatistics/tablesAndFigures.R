@@ -507,3 +507,17 @@ genFigEight <- function(panel) {
 
   p
 }
+
+## Fig 11.
+genFigEleven <- function(panel) {
+  df <- panel %>%
+    mutate(v = if_else(v >=525 & !is.na(v), 525, v))
+  figure <- ggplot(df, aes(v, y = ..density..)) + 
+    geom_histogram(bins = 500, na.rm = TRUE, color = "#d7d29e") + 
+    labs(
+      x = "Willingness-to-accept for four-week deactivation ($)",
+      y = "Percent of sample",
+      title = "Figure 11. Distribution of Willingness-to-Accept to Deactivate Facebook after Midline"
+    )
+  figure
+}
