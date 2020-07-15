@@ -201,12 +201,12 @@ for(var in c("happy_sms", "pos_emotion_sms", "lonely_sms")) {
                 "~",
                 paste(yvar, "_b", sep = ""),
                 "+",
-                paste("index_", vset, "_b", sep = ""),
+                "index_swb_b",
                 "+ D",
                 "|",
                 paste(yvar, "_b", sep = ""),
                 "+",
-                paste("index_", vset, "_b", sep = ""),
+                "index_swb_b",
                 "+ T",
                 sep = " "
             )
@@ -486,3 +486,5 @@ extraTableTwo <- genExtraTable(figTwoDF, "Substitutes for Facebook")
 extraTableThree <- genExtraTable(figThreeDF, "Effects on News and Political Outcomes")
 extraTableFive <- genExtraTable(figFiveDF, "Effects on Subjective Well-Being")
 extraTableSix <- genExtraTable(figSixDF, "Effects on Post-Experiment Facebook Use and Opinions")
+
+
