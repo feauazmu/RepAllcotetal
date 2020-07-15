@@ -1,7 +1,9 @@
+suppressMessages(library(AER))
+suppressMessages(library(cowplot, warn.conflicts = FALSE))
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
-suppressMessages(library(cowplot, warn.conflicts = FALSE))
 library(gt)
+library(purrr, warn.conflicts = FALSE)
 library(tibble)
 library(tidyr)
 
@@ -371,7 +373,7 @@ genFigSeven <- function(panel) {
       nesting(id)
     ) %>%
     arrange(id, day_numeric) %>%
-    mutate(T = as.factor(recode(T, "1 = 'Treatment'; 0 = 'Control'"))) %>%
+    mutate(T = as.factor(car::recode(T, "1 = 'Treatment'; 0 = 'Control'"))) %>%
     group_by(day_numeric, T) %>%
     summarise_all(mean, na.rm = TRUE) %>%
     mutate(
@@ -449,12 +451,12 @@ genFigEight <- function(panel) {
 
   df <- panel %>%
     filter(sample_main == 1) %>%
-    mutate(T = as.factor(recode(T, "1 = 'Treatment'; 0 = 'Control'")))
+    mutate(T = as.factor(car::recode(T, "1 = 'Treatment'; 0 = 'Control'")))
 
   ## Generate the plots
   plot_fb_deact_bad <- ggplot(df, aes(fb_deact_good, y = ..density..)) +
-    geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) +
-    geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) +
+    ggplot2::geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) +
+    ggplot2::geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) +
     labs(
       x = "Deactivation bad",
       y = "Density"
@@ -470,8 +472,8 @@ genFigEight <- function(panel) {
     theme(legend.title = element_blank(), legend.position = "bottom")
 
   plot_fb_habit <- ggplot(df, aes(fb_habit, y = ..density..)) +
-    geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) +
-    geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) +
+    ggplot2::geom_histogram(data = subset(df, T == "Control"), aes(fill="Control", color = "Control"), bins = 11) +
+    ggplot2::geom_histogram(data = subset(df, T == "Treatment"), aes(color="Treatment", fill = "Treatment"), bins = 11) +
     labs(
       x = "People would miss Facebook",
       y = "Density"
@@ -499,11 +501,10 @@ genFigEight <- function(panel) {
     )
 
   figures <- plot_grid(plot_fb_habit, plot_fb_deact_bad)
-  p <- plot_grid(
-    title, figures,
-    ncol  = 1,
-    rel_heights = c(0.1, 1)
-  )
+  p <- plot_grid(title,
+                 figures,
+                 ncol  = 1,
+                 rel_heights = c(0.1, 1))
 
   p
 }
@@ -520,4 +521,147 @@ genFigEleven <- function(panel) {
       title = "Figure 11. Distribution of Willingness-to-Accept to Deactivate Facebook after Midline"
     )
   figure
+}
+
+## Fig 12.
+genFigTwelve <- function(panel) {
+  df <- panel %>%
+    filter(sample_main == 1 & no_endline == 0) %>%
+    mutate(
+      wta2_wins = map_dbl(wta2_wins, ~min(.x, 170)),
+      wta3_wins = map_dbl(wta3_wins, ~min(.x, 170)),
+      v_wins = map_dbl(v_wins, ~min(.x, 170)),
+      T = as.factor(car::recode(T, "1 = 'Treatment'; 0 = 'Control'"))
+    ) %>%
+    select(T, wta2_wins, wta3_wins, v_wins)%>%
+    pivot_longer(
+      cols = c(wta2_wins, wta3_wins, v_wins),
+      names_to = "weeks",
+      values_to = "values",
+      ) %>%
+    mutate(
+      weeks = as.factor(
+        car::recode(weeks, "'v_wins' = 'Weeks 1–4'; 'wta2_wins' = 'Weeks 5–8 at midline'; 'wta3_wins' = 'Weeks 5–8 at endline'"
+        )
+      )
+    ) %>%
+    group_by(T, weeks) %>%
+    summarise(across(values, list(
+      mean = ~mean(.x, na.rm = TRUE), sd = ~sd(.x, na.rm = TRUE), n =~n()
+    )), .groups = "drop_last") %>%
+    mutate(se = values_sd/sqrt(values_n))
+  
+  df$weeks <- factor(
+    df$weeks, levels = c(
+      'Weeks 1–4', 'Weeks 5–8 at midline', "Weeks 5–8 at endline"
+    )
+  )
+  
+  figure <- ggplot(data = df, aes(x=weeks, y=values_mean, fill=T)) + 
+    geom_bar(position = position_dodge(), stat = "identity") + 
+    geom_errorbar(aes(ymin = values_mean - qt(.975, df = values_n) * se,
+                      ymax = values_mean + qt(.975, df = values_n) * se), 
+                  width = .2,
+                  position = position_dodge(.9)) + 
+    labs(
+      x = "",
+      y = "Mean WTA",
+      title = "Figure 12. Average Valuation of Facebook in Treatment and Control"
+    ) + 
+    scale_fill_manual("", values = c(
+      "Control" = "#939598",
+      "Treatment" = "#90353c"
+    )) +
+    scale_y_continuous(breaks=c(0,20, 40, 60, 80, 100))+
+    theme(legend.title = element_blank(), legend.position = "bottom")
+  
+  figure
+  
+}
+
+## Table 6
+genTableSix <- function(panel) {
+  df <- panel %>%
+    filter(sample_main == 1) %>%
+    mutate(
+      wta2_wins170 = map_dbl(wta2_wins, ~min(.x, 170)),
+      wta3_wins170 = map_dbl(wta3_wins, ~min(.x, 170)),
+      v_wins170 = map_dbl(v_wins, ~min(.x, 170)),
+      wta2_wins1000 = map_dbl(wta2_wins, ~min(.x, 1000)),
+      wta3_wins1000 = map_dbl(wta3_wins, ~min(.x, 1000)),
+      v_wins1000 = map_dbl(v_wins, ~min(.x, 1000))
+    ) %>%
+    mutate(
+      endline_wta_update = wta3_wins170 - wta2_wins170,
+      endline_wta_update1000 = wta3_wins1000 - wta2_wins1000
+    )
+  regOne <- ivreg("endline_wta_update ~ v_wins + D | v_wins + T", data = df)
+  regOne_coeftest <-coeftest(regOne, vcov = vcovHC(regOne), "HC3")
+  regTwo <- ivreg("endline_wta_update1000 ~ v_wins1000 + D | v_wins1000 + T", data = df)
+  regTwo_coeftest <-coeftest(regTwo, vcov = vcovHC(regTwo), "HC3") 
+  
+  tableDF <- data.frame(
+    labels = c(
+      "Share of time deactivated",
+      NA,
+      "Observations",
+      "Winsorized maximum WTA",
+      "Treatment mean weeks 5–8 WTA at midline"
+    ),
+    regOne = c(regOne_coeftest["D", "Estimate"],
+               regOne_coeftest["D", "Std. Error"],
+               regOne$nobs,
+               170,
+               mean(df[df["T"] == 1, "wta2_wins170"][[1]], na.rm = TRUE)),
+    regTwo = c(regTwo_coeftest["D", "Estimate"],
+               regTwo_coeftest["D", "Std. Error"],
+               regTwo$nobs,
+               1000,
+               mean(df[df["T"] == 1, "wta2_wins1000"][[1]], na.rm = TRUE))
+  )
+  
+  tableSix <- tableDF %>%
+    gt() %>%
+    fmt_number(
+      columns = vars(regOne, regTwo),
+      rows = c(1, 2),
+      decimals = 2,
+      drop_trailing_zeros = TRUE
+    ) %>%
+    fmt_number(
+      columns = vars(regOne, regTwo),
+      rows = 2,
+      pattern = "({x})"
+    ) %>%
+    fmt_number(
+      columns = vars(regOne, regTwo),
+      rows = 3:5,
+      decimals = 0,
+      drop_trailing_zeros = FALSE
+    ) %>%
+    fmt_missing(
+      columns = everything(),
+      missing_text = ""
+    ) %>%
+    cols_align(
+      align = "center",
+      columns = vars(regOne, regTwo)
+    ) %>%
+    cols_label(
+      labels = "",
+      regOne = "(1)",
+      regTwo = "(2)"
+    ) %>%
+    tab_header("Table 6—Change in Facebook Valuation after Deactivation") %>%
+    tab_source_note(
+      source_note = html("<center><i>Notes</i>: This table presents estimates of
+      equation (5). The dependent variable is the change in WTA for post-endline
+      deactivation measured at endline versus midline. Standard errors are in 
+                         parentheses.</center>")
+    ) %>%
+    tab_options(
+      table.width = pct(75)
+    ) %>%
+    as_raw_html(inline_css = TRUE)
+  tableSix
 }
