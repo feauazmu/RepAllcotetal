@@ -148,7 +148,7 @@ genTableThree <- function(panel, configFile) {
           !is.na(df[row, paste("numchecks_day", x, sep = "")]) &
             df[row, paste("numchecks_day", x, sep = "")] > 0 &
             df[row, "midline_day"] + 1 < x &
-            df[row, "endline_day"] < x &
+            df[row, "endline_day"] > x &
             !is.na(df[row, paste("D_day", x, sep = "")])
 
         ) {
@@ -225,7 +225,14 @@ genTableThree <- function(panel, configFile) {
     )) %>%
     gt() %>%
     fmt_number(
+      columns = vars(treatment, control, pvalue),
+      decimals = 2,
+      drop_trailing_zeros = FALSE,
+      sep_mark = ","
+    ) %>%
+    fmt_number(
       columns = vars(treatment, control),
+      rows = 9,
       decimals = 2,
       drop_trailing_zeros = TRUE,
       sep_mark = ","
@@ -236,12 +243,6 @@ genTableThree <- function(panel, configFile) {
       decimals = 2,
       drop_trailing_zeros = FALSE,
       pattern = "({x})",
-      sep_mark = ","
-    ) %>%
-    fmt_number(
-      columns = vars(pvalue),
-      decimals = 2,
-      drop_trailing_zeros = FALSE,
       sep_mark = ","
     ) %>%
     fmt_missing(
