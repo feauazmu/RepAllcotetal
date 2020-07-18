@@ -5,7 +5,7 @@ results obtained by:
 
 [Allcott, H., Braghieri, L., Eichmeyer, S., & Gentzkow, M. (2020). The welfare effects of social media. *American Economic Review, 110(3)*, 629-76.](https://www.aeaweb.org/articles?id=10.1257/aer.20190658)
 
-The final product of the replication exercise is the jupyter notebook hosted here.   For its proper reproduction, the following services can be used:  
+The final product of the replication exercise is the jupyter notebook hosted here. Some tables may not be displayed properly on github.  Please use one of the following services for its proper reproduction:  
   
 
 <a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/blob/master/replication_notebook.ipynb"
