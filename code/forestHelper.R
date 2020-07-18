@@ -31,7 +31,9 @@ genFigForest <-
              x.label,
              hide.x.axis = TRUE,
              title = NULL,
-             y.scale = NULL) {
+             y.scale = NULL,
+             avg.late = NULL
+            ) {
         figForest <-
             ggplot(data = data.frame(x = X[, varAcross],
                                      y = tau.hat$predictions),
@@ -63,6 +65,12 @@ genFigForest <-
                     axis.text.x = element_blank(),
                     axis.ticks.x = element_blank()
                 )
+        }
+        
+        if(!is.null(avg.late)){
+            figForest <- figForest +
+                geom_hline(yintercept = avg.late,
+                           linetype = "dotted")
         }
         
         if(!is.null(y.scale)){
