@@ -225,6 +225,15 @@ name_happy_sms<- "SMS happiness"
 name_pos_emotion_sms<- "SMS positive emotion"
 name_lonely_sms<- "SMS not lonely"
 
+name_M0 <- "Light users"
+name_M1 <- "Heavy users"
+name_N0 <- "Light news users"
+name_N1 <- "Heavy news users"
+name_F0 <- "Passive users"
+name_F1 <- "Active users"
+name_offpeak <- "Off-peak times"
+name_peak <- "Peak use times"
+
 ## List of Heterogeneous Treatment Effect (HTE) outcome vars
 for (mod in c(
   "W0",
