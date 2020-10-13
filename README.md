@@ -1,4 +1,4 @@
-# Replication of Alcott et al. (2020)
+# Replication of Allcott et al. (2020)
 
 In this repository you can find the code with which I try to replicate the
 results obtained by:
@@ -8,13 +8,13 @@ results obtained by:
 The final product of the replication exercise is the jupyter notebook hosted here. Some tables may not be displayed properly on github.  Please use one of the following services for its proper reproduction:  
   
 
-<a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/blob/master/replication_notebook.ipynb"
+<a href="https://nbviewer.jupyter.org/github/feauazmu/RepAllcotetal/blob/master/replication_notebook.ipynb"
    target="_parent">
    <img align="center"
   src="https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.png"
       width="109" height="20">
 </a>
-<a href="https://mybinder.org/v2/gh/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/master?filepath=replication_notebook.ipynb"
+<a href="https://mybinder.org/v2/gh/feauazmu/RepAllcotetal/master?filepath=replication_notebook.ipynb"
     target="_parent">
     <img align="center"
        src="https://mybinder.org/badge_logo.svg"
@@ -30,10 +30,11 @@ Using the data the authors collected, which is publicly available, I have tried 
 
 ## Reproducibility
 
-[![Build Status](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu.svg?branch=master)](https://travis-ci.org/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu)
+[![Build Status](https://travis-ci.org/feauazmu/RepAllcotetal.svg?branch=master)](https://travis-ci.org/feauazmu/RepAllcotetal)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/blob/master/LICENSE)
-[![Continuous Integration](https://github.com/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/workflows/Continuous%20Integration/badge.svg)](https://github.com/HumanCapitalAnalysis/microeconometrics-course-project-feauazmu/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/feauazmu/RepAllcotetal/blob/master/LICENSE)
+  
+[![Continuous Integration](https://github.com/feauazmu/RepAllcotetal/workflows/Continuous%20Integration/badge.svg)](https://github.com/feauazmu/RepAllcotetal/actions)
 
 ## References
 > Allcott, H., Braghieri, L., Eichmeyer, S., & Gentzkow, M. (2020). The welfare effects of social media. *American Economic Review, 110*(3), 629-76. [doi:10.1214/18-AOS1709](https://doi.org/10.1214%2F18-AOS1709).
